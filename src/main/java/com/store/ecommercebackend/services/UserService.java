@@ -1,0 +1,53 @@
+package com.store.ecommercebackend.services;
+
+import com.store.ecommercebackend.dto.request.RegisterUserRequest;
+import com.store.ecommercebackend.dto.request.UpdateUserRequest;
+import com.store.ecommercebackend.dto.response.UserDto;
+import com.store.ecommercebackend.entities.User;
+import com.store.ecommercebackend.exceptions.UserNotFoundException;
+import com.store.ecommercebackend.mappers.UserMapper;
+import com.store.ecommercebackend.repositories.UserRepository;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+
+    // Get all users
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
+    }
+
+    // Getting a single user
+    public Optional<User> findUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    // Updating user resources
+    public UserDto updateUser(UpdateUserRequest request, User existingUser) {
+        userMapper.updateUser(request, existingUser);
+        userRepository.save(existingUser);
+        return userMapper.toDto(existingUser);
+    }
+
+    // Deleting a user
+    public void deleteUser(Long id) {
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found!.."));
+        userRepository.delete(user);
+    }
+
+    public Object register(@Valid RegisterUserRequest request) {
+        var user = userMapper.toEntity(request);
+        return userRepository.save(user);
+    }
+}

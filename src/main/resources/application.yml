@@ -1,0 +1,15 @@
+
+# Application properties for the project
+spring:
+  application:
+    name: Ecommerce-Backend
+  profiles:
+    active: dev
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+stripe:
+  secretKey: mUKESH
+  webhookSecretKey: WEBHOOK
